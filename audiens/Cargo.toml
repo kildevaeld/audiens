@@ -1,7 +1,15 @@
 [package]
 name = "audiens"
-version = "0.1.0"
-edition = "2021"
+
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+keywords.workspace = true
+categories.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Visitor pattern"
+
 
 [dependencies]
-audiens-macro = { path = "../audiens-macro" }
+audiens-macro = { path = "../audiens-macro", version = "0.1.0" }
