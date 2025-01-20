@@ -108,7 +108,7 @@ impl VisitType {
 fn generate(enum_item: &ItemEnum, kind: VisitType) -> TokenStream2 {
     let visitor_name = kind.trait_name(&enum_item.ident);
 
-    let reference = kind.reference(); // if mutating { quote!(&mut ) } else { quote!(&) };
+    let reference = kind.reference();
 
     let enum_name = format_ident!("{}", enum_item.ident.to_string().to_lowercase());
 
@@ -138,7 +138,7 @@ fn generate(enum_item: &ItemEnum, kind: VisitType) -> TokenStream2 {
                 )
             } else {
                 quote!(
-                    member: #reference (#(#fields),*)
+                    member: (#(#reference #fields),*)
                 )
             }
         } else {
@@ -179,9 +179,15 @@ fn generate(enum_item: &ItemEnum, kind: VisitType) -> TokenStream2 {
         let method_name = kind.method_name(variant.ident.to_string().to_lowercase(), &enum_name);
 
         if tuple {
-            quote!(
-                Self::#name(#(#fields),*) => visitor.#method_name(#(#fields),*)
-            )
+            if fields.len() == 1 {
+                quote!(
+                    Self::#name(#(#fields),*) => visitor.#method_name(#(#fields),*)
+                )
+            } else {
+                quote!(
+                    Self::#name(#(#fields),*) => visitor.#method_name((#(#fields),*))
+                )
+            }
         } else {
             quote!(
                 Self::#name { #(#fields),* } => visitor.#method_name(#(#fields),*)
@@ -193,7 +199,7 @@ fn generate(enum_item: &ItemEnum, kind: VisitType) -> TokenStream2 {
 
     let mut generics = enum_item.generics.clone();
 
-    let enum_emthod = if reference.is_some() {
+    let enum_method = if reference.is_some() {
         generics
             .params
             .push(syn::GenericParam::Lifetime(LifetimeParam::new(
@@ -235,7 +241,7 @@ fn generate(enum_item: &ItemEnum, kind: VisitType) -> TokenStream2 {
         }
 
         impl #enum_generics_impl  #name #enum_generics_type #enum_where_clause {
-            #enum_emthod
+            #enum_method
         }
 
 

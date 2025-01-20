@@ -1,15 +1,5 @@
-[package]
-name = "audiens"
-version = "0.0.1"
-authors = ["Rasmus Kildevæld"]
-edition = "2021"
+[workspace]
 
+resolver = "2"
 
-[lib]
-proc-macro = true
-
-[dependencies]
-syn = { version = "2" }
-quote = "1"
-proc-macro2 = "1"
-darling = "0.20"
+members = ["audiens-macro", "audiens"]
